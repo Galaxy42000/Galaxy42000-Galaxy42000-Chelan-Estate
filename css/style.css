@@ -1,0 +1,157 @@
+:root {
+  --panel-bg: rgba(255, 255, 255, 0.9);
+  --panel-border: rgba(20, 30, 40, 0.1);
+  --text: #1d2630;
+  --muted: #5d6874;
+  --accent: #2f7de1;
+  --btn-bg: #eef1f4;
+  --btn-hover: #e1e6eb;
+  --label-bg: rgba(20, 28, 36, 0.78);
+  --label-text: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --panel-bg: rgba(26, 31, 37, 0.9);
+    --panel-border: rgba(255, 255, 255, 0.1);
+    --text: #e8edf2;
+    --muted: #9aa6b2;
+    --btn-bg: #2b333c;
+    --btn-hover: #36404b;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #e4e9ee;
+  color: var(--text);
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Long presses (walk pad, canvas, buttons) must not select text or pop up the
+   copy/save menu on phones. */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+button, select, label { touch-action: manipulation; }
+
+#viewport, #viewport canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.label-layer { position: fixed !important; inset: 0; pointer-events: none; }
+
+#loading {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  font-size: 15px; color: var(--muted); pointer-events: none;
+}
+body.ready #loading { display: none; }
+
+.panel {
+  position: fixed;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+#hud { top: 12px; left: 12px; width: 330px; max-width: calc(100vw - 24px); padding: 10px 12px; }
+.hud-head { display: flex; align-items: center; gap: 8px; }
+.brand { font-weight: 700; letter-spacing: 0.02em; }
+#room-select {
+  flex: 1; min-width: 0; font: inherit; color: var(--text); background: var(--btn-bg);
+  border: 1px solid var(--panel-border); border-radius: 8px; padding: 4px 6px;
+}
+.hud-body { margin-top: 10px; }
+body.hud-collapsed .hud-body { display: none; }
+
+button {
+  font: inherit; color: var(--text); background: var(--btn-bg);
+  border: 1px solid var(--panel-border); border-radius: 8px; padding: 6px 10px; cursor: pointer;
+}
+button:hover { background: var(--btn-hover); }
+button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.icon { padding: 2px 8px; background: transparent; border-color: transparent; font-size: 16px; line-height: 1.2; }
+
+.btn-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.toggles { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; }
+.toggles label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
+.toggles label[hidden], button[hidden] { display: none; }
+.hint { margin: 8px 0 0; color: var(--muted); font-size: 12.5px; }
+.walk-hint { display: none; }
+body.walking .walk-hint { display: block; }
+body.walking .orbit-hint { display: none; }
+
+#info { right: 12px; top: 12px; width: 300px; max-width: calc(100vw - 24px); padding: 10px 12px; }
+#info[hidden] { display: none; }
+.info-head { display: flex; justify-content: space-between; align-items: center; font-size: 16px; }
+#info dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 8px 0 0; }
+#info dt { color: var(--muted); }
+#info dd { margin: 0; }
+#info .note { margin: 8px 0 0; font-size: 13px; }
+#info .materials { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--panel-border); }
+#info .materials h3 { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+#info .material h4 { margin: 6px 0 0; font-size: 14px; }
+#info .material dl { margin-top: 3px; }
+
+.dim-label {
+  background: var(--label-bg); color: var(--label-text);
+  font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 5px;
+  white-space: nowrap; pointer-events: none;
+}
+.dim-label.wall { background: rgba(47, 125, 225, 0.85); }
+.dim-label.island { background: rgba(65, 86, 107, 0.92); }
+.dim-label.room { background: rgba(255, 255, 255, 0.9); color: #26323f; text-align: center; font-weight: 500; border: 1px solid rgba(38, 50, 63, 0.18); }
+.dim-label.room b { font-weight: 700; }
+.dim-label.dimension { background: #3d4b5c; }
+.dim-label.dimension.estimate { background: rgba(61, 75, 92, 0.6); font-style: italic; }
+
+/* Compass: fixed in the corner, turned so N points at true north on screen. */
+#compass {
+  position: fixed; left: 12px; bottom: 12px;
+  display: flex; flex-direction: column; align-items: center;
+  pointer-events: none;
+}
+#compass svg { display: block; width: 92px; height: 92px; filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.18)); }
+#compass .dial { fill: var(--panel-bg); stroke: var(--panel-border); stroke-width: 1.5; }
+#compass .ticks path { stroke: var(--muted); stroke-width: 2; fill: none; }
+#compass .ticks .minor { stroke-width: 1.2; opacity: 0.6; }
+#compass .needle-n { fill: #d23f31; }
+#compass .needle-s { fill: var(--muted); opacity: 0.55; }
+#compass .hub { fill: var(--text); }
+#compass .letter {
+  fill: var(--text); font: 700 12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  text-anchor: middle; dominant-baseline: central;
+}
+#compass .letter.n { fill: #d23f31; font-size: 14px; }
+#compass .heading {
+  margin-top: 4px; padding: 1px 7px; border-radius: 6px;
+  background: var(--panel-bg); border: 1px solid var(--panel-border);
+  font-size: 11.5px; font-weight: 600; white-space: nowrap;
+}
+
+#walk-pad { display: none; }
+@media (pointer: coarse) {
+  body.walking #walk-pad {
+    display: grid; position: fixed; bottom: 20px; right: 20px;
+    grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(2, 52px); gap: 6px;
+  }
+  #walk-pad button { font-size: 18px; background: var(--panel-bg); touch-action: none; }
+  #walk-pad .up { grid-column: 2; grid-row: 1; }
+  #walk-pad .left { grid-column: 1; grid-row: 2; }
+  #walk-pad .down { grid-column: 2; grid-row: 2; }
+  #walk-pad .right { grid-column: 3; grid-row: 2; }
+}
+
+@media (max-width: 640px) {
+  #hud { left: 8px; right: 8px; top: 8px; width: auto; }
+  #info { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; max-height: 55vh; overflow-y: auto; z-index: 1; }
+  #compass { left: 8px; bottom: 8px; }
+  #compass svg { width: 76px; height: 76px; }
+}
