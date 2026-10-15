@@ -104,7 +104,7 @@ vendor/three/       Three.js r169 (MIT), vendored so the site has no CDN depende
 
 ## Running it
 
-**Live site (after GitHub Pages is turned on):** https://galaxy42000.github.io/Galaxy42000-Chelan-Estate/
+**Live site (after GitHub Pages is turned on):** https://galaxy42000.github.io/Galaxy42000-Galaxy42000-Chelan-Estate/
 
 To turn on Pages: **Settings → Pages**, set **Source** to **Deploy from a branch**, choose **main** and **/ (root)**, and save. After a minute or two the site is live.
 
